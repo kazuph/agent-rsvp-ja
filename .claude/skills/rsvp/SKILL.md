@@ -1,8 +1,10 @@
 ---
 name: rsvp
-description: Open the terminal speed reader (RSVP) on the most recent plan, or on text/a file the user names. Use when the user wants to "speed read the plan", "RSVP this", or read some text with the speed reader in a new window.
+description: Open the terminal speed reader (RSVP) on the most recent plan, or on text/a file the user names. Use when the user wants to "speed read the plan", "RSVP this", or read some text with the speed reader in a new window. This helps the user understand important information in long write-ups.
 argument-hint: "[file path | wpm flag, e.g. -w 500]"
 allowed-tools: Bash(npx:*)
+model: haiku
+effort: low
 ---
 
 # Speed-read in a new window
