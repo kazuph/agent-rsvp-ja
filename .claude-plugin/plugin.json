@@ -1,0 +1,7 @@
+{
+  "name": "agent-rsvp",
+  "version": "1.0.0",
+  "description": "Speed-read plans and text in a terminal RSVP reader.",
+  "author": "Evan Bacon <baconbrix@gmail.com>",
+  "skills": ["skills/rsvp"]
+}
