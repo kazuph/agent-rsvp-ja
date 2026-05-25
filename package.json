@@ -1,6 +1,6 @@
 {
   "name": "agent-rsvp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Terminal RSVP speed reader — flashes one word at a time with a live WPM slider. Ships a CLI and a Claude Code /rsvp plugin.",
   "type": "module",
   "module": "index.ts",
@@ -16,8 +16,7 @@
     "claude-code"
   ],
   "bin": {
-    "agent-rsvp": "dist/index.js",
-    "agent-rsvp-launch": "dist/reader-launch.js"
+    "agent-rsvp": "dist/index.js"
   },
   "files": [
     "dist",
@@ -30,7 +29,7 @@
   "scripts": {
     "dev": "bun run index.ts",
     "start": "bun run index.ts",
-    "build": "bun build ./index.ts ./reader-launch.ts --target=node --outdir dist && chmod +x dist/index.js dist/reader-launch.js",
+    "build": "bun build ./index.ts --target=node --outdir dist && chmod +x dist/index.js",
     "prepublishOnly": "bun run build"
   },
   "devDependencies": {

@@ -22,10 +22,10 @@ default the plan you most recently presented.
 3. Launch the reader on it:
 
    ```bash
-   npx -y agent-rsvp-launch <file> -w 350
+   npx -y agent-rsvp -o <file> -w 350
    ```
 
-   `agent-rsvp-launch` opens the reader in its own Terminal window (a TUI needs
+   `agent-rsvp -o` opens the reader in its own Terminal window (a TUI needs
    its own tty). Pass `-w <wpm>` to set the starting speed; default to 350 if
    the user hasn't asked for a speed. `npx` fetches the package on demand, so no
    prior install is required (it also uses a global install if present).

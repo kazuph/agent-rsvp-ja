@@ -3,8 +3,12 @@
 // One word flashes at a time, aligned on its focal letter (the
 // "optimal recognition point"), with a live WPM slider.
 
-import { openSync, existsSync, readFileSync } from "node:fs";
+import { openSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { ReadStream } from "node:tty";
+import { spawnSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -52,11 +56,13 @@ speed, the space bar to pause, and watch how your comprehension holds up as
 the words begin to blur together.`;
 
 // ---------------------------------------------------------------------------
-// CLI args: an optional file positional plus flags (-w/--wpm to set speed).
+// CLI args: an optional file positional plus flags (-w/--wpm to set speed,
+// -o/--open to launch the reader in its own Terminal window).
 // ---------------------------------------------------------------------------
 function parseArgs(argv: string[]) {
   let file: string | undefined;
   let wpm: number | undefined;
+  let open = false;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "-w" || a === "--wpm") {
@@ -65,14 +71,94 @@ function parseArgs(argv: string[]) {
       wpm = Number(a.slice("--wpm=".length));
     } else if (a.startsWith("-w")) {
       wpm = Number(a.slice(2)); // -w250
+    } else if (a === "-o" || a === "--open") {
+      open = true;
     } else if (!a.startsWith("-")) {
       file = a;
     }
   }
-  return { file, wpm: Number.isFinite(wpm!) ? wpm : undefined };
+  return { file, wpm: Number.isFinite(wpm!) ? wpm : undefined, open };
 }
 
 const args = parseArgs(process.argv.slice(2));
+
+// ---------------------------------------------------------------------------
+// --open: launch the reader in its OWN Terminal window.
+//
+// The reader is a full-screen TUI, so it needs a dedicated terminal with its
+// own tty — it can't share the calling process's. This takes the resolved
+// text, stashes it in a temp file, and opens a new terminal window running
+// this same script (without --open) on it. Returns after spawning.
+// ---------------------------------------------------------------------------
+async function launchInNewWindow(): Promise<void> {
+  // Resolve the text up front so errors surface in the calling terminal.
+  let text: string;
+  if (args.file) {
+    if (!existsSync(args.file)) {
+      console.error(`File not found: ${args.file}`);
+      process.exit(1);
+    }
+    text = readFileSync(args.file, "utf8");
+  } else if (!process.stdin.isTTY) {
+    text = await readStdin();
+  } else {
+    console.error("Provide a file argument or pipe text in.");
+    process.exit(1);
+  }
+  if (!text.trim()) {
+    console.error("Nothing to read (empty input).");
+    process.exit(1);
+  }
+
+  // This script runs as .js (node) when built, .ts (bun) in dev.
+  const self = fileURLToPath(import.meta.url);
+  const runtime = self.endsWith(".ts") ? "bun" : "node";
+
+  // Stash in a temp file so the spawned window can read it independently.
+  const dest = join(tmpdir(), `speed-read-${Date.now()}.md`);
+  writeFileSync(dest, text);
+
+  // Build the command the new window will run. Quote paths for the shell.
+  const q = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`;
+  const passthrough = args.wpm ? ["-w", String(args.wpm)] : [];
+  const cmd = [runtime, q(self), q(dest), ...passthrough].join(" ");
+
+  if (process.platform === "darwin") {
+    // AppleScript string: escape backslashes and double quotes.
+    const osa = cmd.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    spawnSync("osascript", [
+      "-e",
+      `tell application "Terminal" to do script "${osa}"`,
+      "-e",
+      `tell application "Terminal" to activate`,
+    ]);
+    console.log("Opened the speed reader in a new Terminal window.");
+  } else if (process.platform === "linux" && trySpawnLinuxTerminal(cmd, q)) {
+    console.log("Opened the speed reader in a new terminal window.");
+  } else {
+    // Fallback: print the command to run.
+    console.log("Run this in a terminal to start the reader:\n  " + cmd);
+  }
+}
+
+// Try common Linux terminal emulators; return true if one launched.
+function trySpawnLinuxTerminal(command: string, q: (s: string) => string): boolean {
+  const candidates: Array<[string, string[]]> = [
+    ["gnome-terminal", ["--", "bash", "-lc", command]],
+    ["konsole", ["-e", "bash", "-lc", command]],
+    ["xterm", ["-e", `bash -lc ${q(command)}`]],
+  ];
+  for (const [bin, bargs] of candidates) {
+    const r = spawnSync(bin, bargs, { stdio: "ignore" });
+    if (r.error == null) return true;
+  }
+  return false;
+}
+
+if (args.open) {
+  await launchInNewWindow();
+  process.exit(0);
+}
 
 async function loadText(): Promise<string> {
   if (args.file) {

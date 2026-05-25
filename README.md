@@ -28,6 +28,14 @@ cat tea.txt | agent-rsvp -w 250 # read piped stdin at 250 wpm
 `-w` / `--wpm` sets the starting speed. Piped input stays fully interactive —
 the keyboard controls read from the controlling terminal (`/dev/tty`).
 
+`-o` / `--open` opens the reader in its own new Terminal window instead of
+running inline (handy when launching from a context that doesn't own a tty):
+
+```bash
+agent-rsvp -o sample.md -w 350   # from a file
+pbpaste | agent-rsvp -o -w 350   # from the clipboard / stdin
+```
+
 ## Modes
 
 - **minimal** (default): just the single focal word between the guide lines.
@@ -43,11 +51,11 @@ installed, run `/rsvp` to speed-read the plan Claude most recently presented (or
 a file/text you name) in a **new Terminal window** (the reader is a full-screen
 TUI, so it needs its own tty).
 
-Under the hood `/rsvp` calls the bundled launcher:
+Under the hood `/rsvp` calls the CLI with `--open`:
 
 ```bash
-npx -y agent-rsvp-launch plan.md -w 350      # from a file
-pbpaste | npx -y agent-rsvp-launch -w 350    # from the clipboard / stdin
+npx -y agent-rsvp -o plan.md -w 350      # from a file
+pbpaste | npx -y agent-rsvp -o -w 350    # from the clipboard / stdin
 ```
 
 ## Controls
