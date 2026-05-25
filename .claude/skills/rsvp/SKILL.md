@@ -1,40 +1,37 @@
 ---
 name: rsvp
 description: Open the terminal speed reader (RSVP) on the most recent plan, or on text/a file the user names. Use when the user wants to "speed read the plan", "RSVP this", or read some text with the speed reader in a new window.
+argument-hint: "[file path | wpm flag, e.g. -w 500]"
+allowed-tools: Bash(npx:*)
 ---
 
-# Speed-read a plan
+# Speed-read in a new window
 
-Launch the project's RSVP speed reader in a **new Terminal window** on some
-text — by default the plan you most recently presented.
+The launcher below runs immediately via the `!` inline-bash syntax, so when a
+file is given it opens the reader without any extra round-trips:
 
-## Steps
+!`if [ -n "$ARGUMENTS" ]; then npx -y agent-rsvp-launch $ARGUMENTS; else echo "NO_ARGS — no file given, use the recent plan"; fi`
 
-1. Decide what text to read:
-   - If `$ARGUMENTS` names a file path, use that file directly (skip to step 3).
-   - If `$ARGUMENTS` is other text, treat that as the content to read.
-   - Otherwise, use the **most recent plan you presented** in this conversation
-     (the markdown body from your last ExitPlanMode / plan). Use it verbatim.
+## What to do next
 
-2. Write the chosen text to a temp markdown file, e.g.
-   `/tmp/speed-read-plan-$(date +%s).md`, using the Write tool.
+- **If the launcher opened a window above** (a file/args were given): just tell
+  the user it opened in a new window and remind them of the keys —
+  `←/→` speed, `space` pause, `m` mode, `q` quit. You're done.
 
-3. Launch the reader on it from the project directory
-   (`/Users/evanbacon/Documents/GitHub/speed-read-cc`):
+- **If it printed `NO_ARGS`**: no file was given, so speed-read the plan. Take
+  the **most recent plan you presented** in this conversation (the markdown
+  body from your last ExitPlanMode), write it verbatim to
+  `/tmp/rsvp-plan-$(date +%s).md` with the Write tool, then launch it:
 
-   ```bash
-   bun reader-launch.ts <file> -w 600
-   ```
+  ```bash
+  npx -y agent-rsvp-launch <that-file>
+  ```
 
-   `reader-launch.ts` opens the reader in its own Terminal window (a TUI needs
-   its own tty). Pass `-w <wpm>` to set the starting speed; default to 600 if
-   the user hasn't asked for a speed.
-
-4. Tell the user it opened in a new window and remind them of the keys:
-   `←/→` speed, `space` pause, `m` mode, `q` quit.
+  Then share the controls as above.
 
 ## Notes
 
-- Don't try to run the reader inline in Claude Code's terminal — it's a
-  full-screen TUI and needs the separate window the launcher provides.
+- The reader is a full-screen TUI, so the launcher opens it in its own Terminal
+  window — never try to run it inline in Claude Code's terminal.
+- Default speed is 600 wpm; pass `-w <wpm>` in the arguments to change it.
 - If the launcher prints a fallback command (non-macOS), relay it to the user.
