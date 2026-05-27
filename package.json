@@ -1,7 +1,7 @@
 {
-  "name": "agent-rsvp",
+  "name": "agent-rsvp-ja",
   "version": "1.0.1",
-  "description": "Terminal RSVP speed reader — flashes one word at a time with a live WPM slider. Ships a CLI and a Claude Code /rsvp plugin.",
+  "description": "Native RSVP speed reader JA — Zig-built macOS app tuned for Japanese text and Aozora Bunko.",
   "type": "module",
   "module": "index.ts",
   "license": "MIT",
@@ -27,9 +27,9 @@
     "node": ">=20.11"
   },
   "scripts": {
-    "dev": "bun run index.ts",
-    "start": "bun run index.ts",
-    "build": "bun build ./index.ts --target=node --outdir dist && chmod +x dist/index.js",
+    "dev": "zig build run --",
+    "start": "zig build run --",
+    "build": "zig build --release=small && bun build ./index.ts --target=node --outdir dist && cp zig-out/bin/agent-rsvp-native dist/agent-rsvp-native && chmod +x dist/index.js dist/agent-rsvp-native && (codesign --force --sign - dist/agent-rsvp-native 2>/dev/null || true)",
     "prepublishOnly": "bun run build"
   },
   "devDependencies": {

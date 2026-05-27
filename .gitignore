@@ -4,6 +4,8 @@ node_modules
 # output
 out
 dist
+zig-out
+.zig-cache
 *.tgz
 
 # code coverage

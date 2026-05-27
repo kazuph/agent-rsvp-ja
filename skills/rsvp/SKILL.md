@@ -1,11 +1,11 @@
 ---
 name: rsvp
-description: Open the terminal speed reader (RSVP) on the most recent plan, or on text/a file the user names. Use when the user wants to "speed read the plan", "RSVP this", or read some text with the speed reader in a new window.
+description: Open the native speed reader (RSVP) on the most recent plan, or on text/a file the user names. Use when the user wants to "speed read the plan", "RSVP this", or read some text with the speed reader in a new window.
 ---
 
 # Speed-read a plan
 
-Launch the RSVP speed reader in a **new Terminal window** on some text — by
+Launch the RSVP speed reader in a native window on some text — by
 default the plan you most recently presented.
 
 ## Steps
@@ -13,6 +13,7 @@ default the plan you most recently presented.
 1. Decide what text to read:
    - If `$ARGUMENTS` names a file path, use that file directly (skip to step 3).
    - If `$ARGUMENTS` is other text, treat that as the content to read.
+   - If there is no text/file, launch `agent-rsvp -o` so the user can choose a file.
    - Otherwise, use the **most recent plan you presented** in this conversation
      (the markdown body from your last ExitPlanMode / plan). Use it verbatim.
 
@@ -25,17 +26,20 @@ default the plan you most recently presented.
    npx -y agent-rsvp -o <file> -w 350
    ```
 
-   `agent-rsvp -o` opens the reader in its own Terminal window (a TUI needs
-   its own tty). Pass `-w <wpm>` to set the starting speed; default to 350 if
+   `agent-rsvp -o` opens the reader in its own native window without Terminal.
+   Pass `-w <wpm>` to set the starting speed; default to 350 if
    the user hasn't asked for a speed. `npx` fetches the package on demand, so no
    prior install is required (it also uses a global install if present).
 
+   Use `agent-rsvp -t <file>` only when inspecting chunk boundaries; it prints
+   the display chunks one per line and does not open a window.
+   Use `agent-rsvp --test-layout <file>` when inspecting where the red focus
+   character will appear.
+
 4. Tell the user it opened in a new window and remind them of the keys:
-   `←/→` speed, `space` pause, `m` mode, `q` quit.
+   `o` open file, `f` fullscreen, `h/l` speed, `j/k` visible lines (starts at 1), `m`/`Tab` mode, `Cmd-/Cmd+` font, `space` pause, `q` quit.
 
 ## Notes
 
-- Don't try to run the reader inline in the agent's terminal — it's a
-  full-screen TUI and needs the separate window the launcher provides.
-- If the launcher prints a fallback command (non-macOS/Linux), relay it to the
-  user so they can run it themselves.
+- Don't use macOS Terminal or osascript for `/rsvp`; `agent-rsvp -o` detaches a
+  native window process directly.
