@@ -617,7 +617,7 @@ static NSString *focalPreview(NSString *text) {
     CGFloat midY = NSMidY(self.bounds);
     CGFloat firstY = midY + ((CGFloat)(lineCount - 1) * rowHeight / 2.0);
     CGFloat focalX = NSMidX(self.bounds);
-    CGFloat topGuideY = firstY + wordSize + 2.0;
+    CGFloat topGuideY = firstY + wordSize + 22.0;
     CGFloat bottomGuideY = firstY - ((CGFloat)(lineCount - 1) * rowHeight) - 18;
 
     if (self.state.contextMode) {
