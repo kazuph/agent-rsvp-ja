@@ -23,13 +23,13 @@ default the plan you most recently presented.
 3. Launch the reader on it:
 
    ```bash
-   npx -y agent-rsvp -o <file> -w 350
+   agent-rsvp -o <file> -w 350
    ```
 
    `agent-rsvp -o` opens the reader in its own native window without Terminal.
    Pass `-w <wpm>` to set the starting speed; default to 350 if
-   the user hasn't asked for a speed. `npx` fetches the package on demand, so no
-   prior install is required (it also uses a global install if present).
+   the user hasn't asked for a speed. This command expects the local
+   `agent-rsvp-ja` fork to be installed or linked first.
 
    Use `agent-rsvp -t <file>` only when inspecting chunk boundaries; it prints
    the display chunks one per line and does not open a window.

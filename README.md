@@ -10,18 +10,26 @@ fixed-position focus-character rendering.
 
 ## Install
 
-Runs on **Node ≥ 20.11**. The published CLI launches a Zig-built native macOS
-window instead of opening Terminal.
+Runs on **Node ≥ 20.11**. The CLI launches a Zig-built native macOS window
+instead of opening Terminal.
+
+This fork is not published to npm as `agent-rsvp-ja` yet. Do not use
+`npx agent-rsvp`: that package name resolves to the upstream package on npm.
+
+Install from this repository:
 
 ```bash
-# one-off, no install
-npx agent-rsvp sample.md
-npx agent-rsvp -w 450 sample.md
+git clone https://github.com/kazuph/agent-rsvp-ja.git
+cd agent-rsvp-ja
+bun install
+bun run build
+npm link
 
-# or install globally
-npm i -g agent-rsvp
 agent-rsvp sample.md
 ```
+
+After npm publication, the package install command should use the `agent-rsvp-ja`
+package name, while the installed command remains `agent-rsvp`.
 
 ```bash
 agent-rsvp                      # built-in sample text
@@ -80,8 +88,8 @@ a file/text you name) in a native window.
 Under the hood `/rsvp` calls the CLI with `--open`:
 
 ```bash
-npx -y agent-rsvp -o plan.md -w 350      # from a file
-pbpaste | npx -y agent-rsvp -o -w 350    # from the clipboard / stdin
+agent-rsvp -o plan.md -w 350      # from a file
+pbpaste | agent-rsvp -o -w 350    # from the clipboard / stdin
 ```
 
 ## Controls
